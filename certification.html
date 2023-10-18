@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>誠陽復健診所診斷書生成系統</title>
+    <style>
+       table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+
+table {
+    width: 85%;
+    margin: 0 auto; /* Center the table within its container */
+}
+
+td, th {
+    padding: 8px;
+    text-align: center;
+    font-size: 24px;
+}
+
+td {
+    padding: 8px;
+    text-align: center;
+    width: 100px;  /* Example width, you can adjust as needed */
+    height: 20px;  /* Example height, you can adjust as needed */
+    word-wrap: break-word;  /* Allows content to break at word boundaries */
+}
+
+.auto-adjust-font {
+    font-size: 20px;  /* Initial maximum font size */
+}
+
+.input-form {
+    margin-bottom: 20px;
+}
+
+
+
+
+
+
+
+
+        #docInfo, #docDoctorAdvice {
+            height: 8em;
+            vertical-align: top;
+            text-align: left;
+            padding-left: 15px;
+        }
+        #docDisease {
+            height: 3em;
+            vertical-align: top;
+            text-align: left;
+            padding-left: 15px;
+        }
+        #docInfo {
+            font-size: 1.5em;
+        }
+
+        th {
+            font-size: 2.5em;
+        }
+
+        @media print {
+            body {
+                width: 210mm;
+                height: 297mm;
+                margin: 0;
+                padding: 20mm;
+            }
+
+            .input-form {
+                display: none;
+            }
+        }
+
+        .input-form input[type="text"],
+        .input-form input[type="number"],
+        .input-form input[type="date"],
+        .input-form select,
+        .input-form textarea {
+            width: 400px;
+            font-size: 2em;
+        }
+
+        .input-form textarea {
+            height: 100px;
+        }
+
+        .note {
+            font-size: 0.8em;
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .footer {
+            width: 75%;
+            margin: 40px auto; /* 這行會使底部內容在其容器中居中 */
+            text-align: center;
+            border: none;
+        }
+
+
+
+
+        #printArea {
+            width: 210mm;
+            height: 297mm;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #jpegOutput {
+            text-align: center;  /* 將JPEG居中對齊 */
+        }
+
+        #jpegOutput img {
+            display: inline-block;
+        }
+
+
+
+
+.note1 {
+    font-size: 28px; 
+    margin-bottom: 15px; 
+    position: relative;
+    left:60px; /* 往右移動10px */
+    top:20 px;  /* 往下移動5px */}
+
+
+
+
+
+.clinic {
+    font-size: 22px; 
+    margin-bottom: 15px; 
+    position: relative;
+    left:60px; /* 往右移動10px */
+    top:20 px;  /* 往下移動5px */
+
+
+}
+
+.doctor {
+    font-size: 24px; 
+    margin-bottom: 15px; 
+    position: relative;
+    left:60px; /* 往右移動10px */
+    top:30 px;  /* 往下移動5px */
+}
+
+
+
+
+
+.note2 {
+    font-size: 20px; 
+    margin-bottom: 15px; 
+    position: relative;
+    left:60px; /* 往右移動10px */
+    top:100 px;  /* 往下移動5px */}
+
+
+.clinic, .doctor, .note2 {
+    left: 60px;  // 從50px減少到10px
+}
+
+.doctor {
+    top: 60px;  // 從40px增加到60px
+}
+
+.note2 {
+    top: 140px;  // 從80px增加到140px
+}
+
+
+
+
+
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+</head>
+<body>
+
+<h2>誠陽復健診所診斷書生成系統</h2>
+<div class="input-form">
+
+
+
+
+
+
+
+    <label for="name">姓名:</label>
+    <input type="text" id="name" name="name"><br>
+
+    <label for="gender">性別:</label>
+    <select id="gender" name="gender">
+        <option value="男">男</option>
+        <option value="女">女</option>
+    </select><br>
+
+    <label for="idNumber">身份證字號:</label>
+    <input type="text" id="idNumber" name="idNumber"><br>
+
+    <label for="birthPlace">出生地:</label>
+    <input type="text" id="birthPlace" name="birthPlace"><br>
+
+    <label for="age">年齡(歲):</label>
+    <input type="number" id="age" name="age"><br>
+
+    <label for="birthDate">生日 (民國年月日):</label>
+    <input type="text" id="birthDate" name="birthDate" placeholder="例: 110年1月1日"><br>
+
+    <label for="address">住址:</label>
+    <input type="text" id="address" name="address"><br>
+
+    <label for="startDate">應診日期 (民國年月日):</label>
+    <input type="text" id="startDate" name="startDate" placeholder="例: 110年1月1日"><br>
+
+    <label for="department">科別:</label>
+    <input type="text" id="department" name="department"><br>
+
+    <label for="medicalNumber">病歷號碼:</label>
+    <input type="text" id="medicalNumber" name="medicalNumber"><br>
+
+    <label for="disease">病名:</label>
+    <input type="text" id="disease" name="disease"><br>
+
+    <label for="doctorAdvice">醫囑:</label>
+    <textarea id="doctorAdvice" name="doctorAdvice"></textarea><br>
+
+
+<label for="storeNumber">儲存編號(一定要輸入才會儲存!! 預設為病歷號, 但如同一天有同病歷號有多張診斷書:為病歷號-1,病歷號-2以此類推 ):</label>
+<input type="text" id="storeNumber" name="storeNumber"><br>
+
+
+
+<label for="fontSize">字體大小(調整字體大小以適配列印):</label>
+<input type="number" id="fontSize" name="fontSize" value="24"><br>
+<input type="button" value="增加字體" onclick="adjustManualFontSize(1);">
+<input type="button" value="減少字體" onclick="adjustManualFontSize(-1);">
+
+
+
+
+
+
+<input type="button" value="生成診斷書" onclick="generateDocument(); previewPrint();">
+
+
+
+<input type="button" value="儲存資料" onclick="saveToDatabase();">
+    <input type="button" value="預覽JPEG" onclick="previewPrint()" style="margin-top: 10px;">
+</div>
+
+<div id="printArea">
+    <table id="generatedDocument" style="display: none;">
+        <thead>
+        <tr>
+            <th colspan="4">誠陽復健診所診斷證明書</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>姓名</td>
+            <td id="docName" class="auto-adjust-font"></td>
+            <td>性別</td>
+            <td id="docGender"></td>
+        </tr>
+        <tr>
+            <td>身份證字號</td>
+            <td id="docIdNumber" class="auto-adjust-font"></td>
+            <td>出生地</td>
+            <td id="docBirthPlace"></td>
+        </tr>
+        <tr>
+            <td>年齡</td>
+            <td id="docAge"></td>
+            <td>出生年月日</td>
+            <td id="docBirthDate"></td>
+        </tr>
+        <tr>
+            <td>住址</td>
+            <td id="docAddress" class="auto-adjust-font"  colspan="3"></td>
+        </tr>
+        <tr>
+            <td>應診日期</td>
+            <td id="docStartDate" colspan="3"></td>
+        </tr>
+        <tr>
+            <td>科別</td>
+            <td id="docDepartment" colspan="3"></td>
+        </tr>
+        <tr>
+            <td>病歷號碼</td>
+            <td id="docMedicalNumber" colspan="3"></td>
+        </tr>
+        <tr>
+            <td>病名</td>
+            <td id="docDisease"  class="auto-adjust-font" colspan="3"></td>
+        </tr>
+        <tr>
+            <td>醫囑</td>
+            <td id="docDoctorAdvice" class="auto-adjust-font"  colspan="3"></td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="4">診斷書開立日期: <span id="currentDate"></span></td>
+        </tr>
+        </tfoot>
+    </table>
+
+
+<div class="note1"> 以上病人經本院醫師診斷屬實特予證明   </div>
+<div class="clinic">診所地址:新北市樹林區東華街81, 83, 85號 電話:02-86852806</div>
+<div class="doctor">醫師楊景堯    醫師證書字號40699號</div>
+<div class="note2"> ◎本證明書須加蓋本院（所）印章否則無效   本診斷書非訴訟用途 </div>
+
+</div>
+
+</div>
+
+<div id="jpegOutput" style="margin-top: 20px;"></div>
+
+
+
+
+
+
+<script>
+
+function adjustManualFontSize(direction) {
+    const elements = document.querySelectorAll('.auto-adjust-font');
+    const currentSize = parseInt(document.getElementById("fontSize").value);
+    const newSize = currentSize + direction;
+    document.getElementById("fontSize").value = newSize;
+    elements.forEach(element => {
+        element.style.fontSize = newSize + 'px';
+    });
+}
+
+
+
+
+
+
+
+    function generateDocument() {
+        document.getElementById("docName").textContent = document.getElementById("name").value;
+        document.getElementById("docGender").textContent = document.getElementById("gender").value;
+        document.getElementById("docIdNumber").textContent = document.getElementById("idNumber").value;
+        document.getElementById("docBirthPlace").textContent = document.getElementById("birthPlace").value;
+        document.getElementById("docAge").textContent = document.getElementById("age").value + " 歲";
+        document.getElementById("docBirthDate").textContent =   document.getElementById("birthDate").value;
+        document.getElementById("docAddress").textContent = document.getElementById("address").value;
+        document.getElementById("docStartDate").textContent =  document.getElementById("startDate").value;
+        document.getElementById("docDepartment").textContent = document.getElementById("department").value;
+        document.getElementById("docMedicalNumber").textContent = document.getElementById("medicalNumber").value;
+        document.getElementById("docDisease").textContent = document.getElementById("disease").value;
+        document.getElementById("docDoctorAdvice").textContent = document.getElementById("doctorAdvice").value;
+
+        const currentDate = new Date();
+        const year = currentDate.getFullYear() - 1911; // Convert to ROC year
+        const month = currentDate.getMonth() + 1;
+        const day = currentDate.getDate();
+        document.getElementById("currentDate").textContent = "中華民國 " + year + " 年 " + month + " 月 " + day + " 日";
+
+        document.getElementById("generatedDocument").style.display = 'table';
+
+
+  const elements = document.querySelectorAll('.auto-adjust-font');
+    elements.forEach(element => {
+        adjustFontSize(element);
+    });
+
+
+
+
+
+
+
+
+    }
+
+function previewPrint() {
+    const element = document.getElementById("printArea");
+        
+    html2canvas(element, {
+        scale: 1
+    }).then(function (canvas) {
+        const jpegOutput = document.getElementById("jpegOutput");
+        const image = new Image();
+        image.src = canvas.toDataURL("image/jpeg");
+        jpegOutput.innerHTML = "";
+        jpegOutput.appendChild(image);
+    });
+}
+
+
+function saveToDatabase() {
+
+
+
+const storeNumber = document.getElementById("storeNumber").value;
+
+    const element = document.getElementById("printArea");
+
+    // 準備文本數據
+    const docData = {
+        name: document.getElementById("name").value,
+        gender: document.getElementById("gender").value,
+        idNumber: document.getElementById("idNumber").value,
+        birthPlace: document.getElementById("birthPlace").value,
+        age: document.getElementById("age").value,
+        birthDate: document.getElementById("birthDate").value,
+        address: document.getElementById("address").value,
+        startDate: document.getElementById("startDate").value,
+        department: document.getElementById("department").value,
+        medicalNumber: document.getElementById("medicalNumber").value,
+        disease: document.getElementById("disease").value,
+        doctorAdvice: document.getElementById("doctorAdvice").value
+    };
+
+    html2canvas(element, { scale: 1 }).then(function(canvas) {
+        const jpegData = canvas.toDataURL("image/jpeg");
+
+        fetch('/saveDocument', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+
+medicalNumber: storeNumber,
+
+
+
+
+
+
+                jpegData: jpegData,
+                textData: docData,  // 這裡加入文本數據
+                date: new Date().toISOString() // Store as ISO string
+            })
+        }).then(response => response.json()).then(data => {
+            if (data.status === 'success') {
+                alert("保存成功!");
+            } else {
+                alert("保存失敗: " + data.message);
+            }
+        });
+    });
+}
+
+
+
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
